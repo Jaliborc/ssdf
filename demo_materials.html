@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Material Masking Pass</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000000;
+				margin: 0px;
+				overflow: hidden;
+				font-family:Monospace;
+				font-size:13px;
+				text-align:center;
+				font-weight: bold;
+			}
+
+			a { color:#00ff78; }
+
+			#info {
+				color: #fff;
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				padding: 5px;
+			}
+			.dg.ac {
+				z-index: 1 !important;
+			}
+		</style>
+	</head>
+	<body>
+		<script src="lib/stats.min.js"></script>
+		<script src="lib/three.min.js"></script>
+		<script src="lib/three.shaders/CopyShader.js"></script>
+		<script src="lib/three.postprocessing/EffectComposer.js"></script>
+		<script src="lib/three.postprocessing/ShaderPass.js"></script>
+		<script src="lib/three.external/WebGL.js"></script>
+
+		<script src="js/MaterialMaskPass.js"></script>
+		<div id="info">
+			material masking pass - by <a href="http://jaliborc.com" target="_blank" rel="noopener">Joao Cardoso</a><br/>
+
+			<div id="error" style="display: none;">
+				Your browser does not support <strong>WEBGL_depth_texture</strong>.<br/><br/>
+				This demo will not work.
+			</div>
+		</div>
+
+		<script>
+			if ( WEBGL.isWebGLAvailable() === false )
+				document.body.appendChild( WEBGL.getWebGLErrorMessage() )
+
+			var container, stats
+			var camera, scene, renderer
+			var effectComposer
+			var ssdf
+			var group
+
+			init()
+			animate()
+
+			function init() {
+				container = document.createElement( 'div' )
+				document.body.appendChild( container )
+
+				stats = new Stats()
+				container.appendChild( stats.dom )
+
+				renderer = new THREE.WebGLRenderer()
+				renderer.setSize( window.innerWidth, window.innerHeight )
+				document.body.appendChild( renderer.domElement )
+
+				if ( !renderer.extensions.get('WEBGL_depth_texture') ) {
+					document.querySelector( '#error' ).style.display = 'block'
+					return
+				}
+
+				camera = new THREE.PerspectiveCamera( 65, window.innerWidth / window.innerHeight, 100, 700 )
+				camera.position.z = 500
+
+				scene = new THREE.Scene()
+				group = new THREE.Group()
+
+				scene.background = new THREE.Color( 0xaaaaaa )
+				scene.add( new THREE.DirectionalLight() )
+				scene.add( new THREE.HemisphereLight() )
+				scene.add( group )
+
+				var geometry = new THREE.BoxBufferGeometry( 10, 10, 10 )
+				for ( var i = 0; i < 100; i++ ) {
+					var material = new THREE.MeshLambertMaterial({
+						color: Math.random() * 0xffffff
+					})
+
+					var mesh = new THREE.Mesh( geometry, material )
+					mesh.position.x = Math.random() * 400 - 200
+					mesh.position.y = Math.random() * 400 - 200
+					mesh.position.z = Math.random() * 400 - 200
+					mesh.rotation.x = Math.random()
+					mesh.rotation.y = Math.random()
+					mesh.rotation.z = Math.random()
+					mesh.scale.setScalar( Math.random() * 10 + 2 )
+					group.add( mesh )
+				}
+
+				materialPass = new THREE.MaterialMaskPass( scene, camera )
+				materialPass.renderToScreen = true
+
+				effectComposer = new THREE.EffectComposer( renderer )
+				effectComposer.addPass( materialPass )
+
+				window.addEventListener( 'resize', onWindowResize, false )
+				onWindowResize()
+			}
+
+			function onWindowResize() {
+				var width = window.innerWidth
+				var height = window.innerHeight
+
+				camera.aspect = width / height
+				camera.updateProjectionMatrix()
+				renderer.setSize( width, height )
+			}
+
+			function animate() {
+				requestAnimationFrame( animate )
+
+				stats.begin()
+				render()
+				stats.end()
+			}
+
+			function render() {
+				var timer = performance.now()
+				group.rotation.x = timer * 0.0002
+				group.rotation.y = timer * 0.0001
+
+				effectComposer.render()
+			}
+		</script>
+	</body>
+</html>
