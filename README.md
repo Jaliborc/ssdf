@@ -2,7 +2,7 @@
 A demo implementation of a method for generating distance fields in screen space in real-time.
 Note that the method has many cases were it creates artifacts or does not generate accurate results at a reasonable computational cost. Thus, it should not be used in production and should only be regarded as a thought experiment.
 
-![](http://jaliborc.com/images/research/ssdf.png)
+![](http://jaliborc.com/images/research/ssdf.png#2)
 
 Demo running at [ssdf.jaliborc.com](http://ssdf.jaliborc.com/demo_distance.html).
 Detailed description and analysis at chapter 4 of [this thesis](http://jaliborc.com/downloads/mscthesis.pdf). An excerpt follows:
