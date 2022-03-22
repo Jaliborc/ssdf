@@ -1,6 +1,6 @@
 # Screen Space Distance Fields
 A demo implementation of a method for generating distance fields in screen space in real-time.
-Note that the method has many cases were it creates artifacts or does not generate accurate results at a reasonable computational cost. Thus, it should not be used in production and should only be regarded as a thought experiment.
+Note that the method has many cases were it creates artifacts or does not generate accurate results at a reasonable computational cost.
 
 ![](http://jaliborc.com/images/research/ssdf.png#2)
 
